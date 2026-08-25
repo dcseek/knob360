@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KNOB360 — The rotary control for your smart home</title>
+<meta name="description" content="KNOB360 turns the Elecrow CrowPanel 1.46″ into a rotary control for Home Assistant. Climate, thermostat and lights from a round display. 100% local, zero cloud.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08090a; --panel:#0f1011; --surface:#191a1b; --surface2:#28282c;
+    --text:#f7f8f8; --text2:#d0d6e0; --text3:#8a8f98; --text4:#62666d;
+    --accent:#22d3ee; --accent-hover:#67e8f9; --accent-dim:rgba(34,211,238,.12);
+    --border:rgba(255,255,255,.08); --border-subtle:rgba(255,255,255,.05);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    font-feature-settings:'cv01','ss03';
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;background:rgba(8,9,10,.85);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--border-subtle);
+  }
+  nav .container{display:flex;align-items:center;justify-content:space-between;height:56px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;letter-spacing:-.02em}
+  .logo svg{width:22px;height:22px}
+  .nav-links{display:flex;gap:28px;align-items:center}
+  .nav-links a{color:var(--text2);text-decoration:none;font-size:13.5px;font-weight:500}
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{
+    background:var(--accent);color:#041417;font-weight:600;font-size:13.5px;
+    padding:7px 14px;border-radius:6px;text-decoration:none;
+  }
+  .nav-cta:hover{background:var(--accent-hover)}
+  @media(max-width:768px){.nav-links{display:none}}
+
+  /* ---------- hero ---------- */
+  header{padding:96px 0 64px;text-align:center;position:relative;overflow:hidden}
+  header::before{
+    content:"";position:absolute;top:-260px;left:50%;transform:translateX(-50%);
+    width:720px;height:720px;border-radius:50%;
+    background:radial-gradient(circle,rgba(34,211,238,.10),transparent 60%);
+    pointer-events:none;
+  }
+  .pill{
+    display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);
+    border-radius:9999px;padding:5px 14px 5px 9px;color:var(--text2);
+    font-size:13px;font-weight:500;margin-bottom:28px;background:rgba(255,255,255,.02);
+  }
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  h1{
+    font-size:clamp(44px,7vw,72px);font-weight:500;line-height:1.02;
+    letter-spacing:-.022em;color:var(--text);margin-bottom:24px;
+  }
+  h1 .accent{color:var(--accent)}
+  .sub{
+    max-width:640px;margin:0 auto 36px;font-size:18px;font-weight:400;
+    line-height:1.6;color:var(--text3);letter-spacing:-.01em;
+  }
+  .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    display:inline-block;padding:11px 20px;border-radius:6px;font-size:15px;
+    font-weight:600;text-decoration:none;transition:background .15s;
+  }
+  .btn-primary{background:var(--accent);color:#041417}
+  .btn-primary:hover{background:var(--accent-hover)}
+  .btn-ghost{
+    background:rgba(255,255,255,.02);color:var(--text2);
+    border:1px solid var(--border);
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,.05);color:var(--text)}
+  .hero-meta{margin-top:22px;font-size:13px;color:var(--text4);font-weight:500}
+  .hero-meta span{color:var(--text3)}
+  .hero-visual{margin:56px auto 0;width:300px;height:300px;position:relative}
+  .hero-visual .ring{
+    position:absolute;inset:0;border-radius:50%;
+    border:1px solid rgba(255,255,255,.14);box-shadow:0 0 60px rgba(34,211,238,.15);
+  }
+  .hero-visual img{
+    width:100%;height:100%;border-radius:50%;object-fit:cover;
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .hero-visual .arc{
+    position:absolute;inset:-14px;border-radius:50%;
+    border:2px solid transparent;border-top-color:var(--accent);border-right-color:var(--accent);
+    opacity:.6;transform:rotate(-20deg);
+  }
+  .tech-row{
+    margin-top:64px;display:flex;gap:36px;justify-content:center;flex-wrap:wrap;
+    font-size:13px;font-weight:500;color:var(--text4);letter-spacing:.02em;text-transform:uppercase;
+  }
+
+  /* ---------- sections ---------- */
+  section{padding:88px 0}
+  .section-label{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+  h2{font-size:clamp(30px,4vw,44px);font-weight:500;line-height:1.05;letter-spacing:-.022em;margin-bottom:18px}
+  .lead{max-width:620px;font-size:17px;line-height:1.6;color:var(--text3)}
+  section.center{text-align:center}
+  section.center .lead{margin:0 auto}
+
+  /* features */
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:48px}
+  @media(max-width:900px){.grid-3{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}}
+  .card{
+    background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;
+    padding:26px;transition:background .15s;
+  }
+  .card:hover{background:rgba(255,255,255,.04)}
+  .card .ico{
+    width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    background:var(--accent-dim);border:1px solid rgba(34,211,238,.25);margin-bottom:18px;
+  }
+  .card h3{font-size:19px;font-weight:600;letter-spacing:-.015em;margin-bottom:10px}
+  .card p{font-size:14.5px;line-height:1.6;color:var(--text3)}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px;counter-reset:step}
+  @media(max-width:900px){.steps{grid-template-columns:1fr}}
+  .step{position:relative;padding:26px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.02)}
+  .step::before{
+    counter-increment:step;content:"0" counter(step);
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--accent);
+    display:block;margin-bottom:14px;
+  }
+  .step h3{font-size:17px;font-weight:600;margin-bottom:8px}
+  .step p{font-size:14px;line-height:1.6;color:var(--text3)}
+
+  /* included */
+  .split{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;margin-top:48px}
+  @media(max-width:900px){.split{grid-template-columns:1fr}}
+  .list-card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px 26px}
+  .list-card li{
+    list-style:none;padding:15px 0;border-bottom:1px solid var(--border-subtle);
+    font-size:15px;color:var(--text2);display:flex;gap:12px;align-items:flex-start;
+  }
+  .list-card li:last-child{border-bottom:none}
+  .list-card .tick{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:14px;margin-top:1px}
+  .list-card .tick::before{content:"✓ "}
+  .req{border:1px solid var(--border);border-radius:8px;padding:26px;background:var(--panel)}
+  .req h3{font-size:16px;font-weight:600;margin-bottom:14px}
+  .req li{list-style:none;font-size:14px;color:var(--text3);padding:9px 0;border-bottom:1px solid var(--border-subtle);display:flex;gap:10px}
+  .req li:last-child{border-bottom:none}
+  .req .dot{color:var(--accent)}
+
+  /* privacy */
+  .privacy{border:1px solid rgba(34,211,238,.25);background:linear-gradient(180deg,rgba(34,211,238,.06),rgba(34,211,238,.02));border-radius:12px;padding:48px;margin-top:48px}
+  .privacy h2{margin-bottom:12px}
+  .privacy .lead{margin-bottom:0}
+  .privacy .pills{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .privacy .pills span{
+    border:1px solid var(--border);border-radius:9999px;padding:6px 14px;
+    font-size:13px;font-weight:500;color:var(--text2);background:rgba(255,255,255,.02);
+  }
+
+  /* faq */
+  .faq{max-width:720px;margin:40px auto 0;text-align:left}
+  details{border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:12px;overflow:hidden}
+  summary{
+    cursor:pointer;padding:18px 22px;font-size:15.5px;font-weight:500;color:var(--text);
+    list-style:none;display:flex;justify-content:space-between;align-items:center;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:18px;color:var(--text3);transition:transform .15s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details p{padding:0 22px 18px;font-size:14.5px;line-height:1.65;color:var(--text3)}
+
+  /* final cta */
+  .final{text-align:center;padding:96px 0 72px}
+  .final h2{margin-bottom:14px}
+  .final .price{font-size:34px;font-weight:500;letter-spacing:-.02em;margin:26px 0 4px}
+  .final .price small{font-size:15px;color:var(--text3);font-weight:400}
+  .final .note{font-size:13px;color:var(--text4);margin-top:14px}
+
+  /* photos */
+  .photo-card figure{margin:0}
+  .photo-card img{width:100%;border-radius:8px;border:1px solid var(--border);display:block}
+  .photo-card figcaption{font-size:13px;color:var(--text3);margin-top:10px}
+  .photo-card figcaption code{font-family:'JetBrains Mono',monospace;color:var(--text2);font-size:12px}
+
+  footer{border-top:1px solid var(--border-subtle);padding:36px 0 48px}
+  footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+  footer p,footer a{font-size:13px;color:var(--text4)}
+  footer a{color:var(--text3);text-decoration:none}
+  footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a class="logo" href="#">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#22d3ee" stroke-width="2.4" stroke-dasharray="42 15" stroke-linecap="round"/><circle cx="12" cy="12" r="3.4" fill="#f7f8f8"/></svg>
+      KNOB360
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#included">What's included</a>
+      <a href="#photos">Photos</a>
+      <a href="#faq">FAQ</a>
+      <a class="nav-cta" href="#buy">Get the pack</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="container">
+    <div class="pill"><span class="dot"></span> ESPHome config pack for Home Assistant</div>
+    <h1>Your home,<br>at a <span class="accent">twist</span>.</h1>
+    <p class="sub">KNOB360 turns the Elecrow CrowPanel 1.46″ into a rotary control for your smart home — climate, thermostat and lights on a round 360×360 display, with an RGB ring that answers every command.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#buy">Get the pack — €19.90</a>
+      <a class="btn btn-ghost" href="#included">What's included</a>
+    </div>
+    <p class="hero-meta">Tested on real hardware <span>·</span> August 2026 <span>·</span> 100% local</p>
+    <div class="hero-visual">
+      <div class="ring"></div>
+      <div class="arc"></div>
+      <img src="photos/wall-logo.jpg" alt="KNOB360 mounted on a wall, logo on the round display with the blue ring glowing">
+    </div>
+    <div class="tech-row">
+      <span>Home Assistant</span><span>ESPHome</span><span>Elecrow CrowPanel 1.46″</span><span>ESP32-S3</span>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2>Everything at a twist</h2>
+    <p class="lead">Four pages, one knob. Turn to navigate, click to lock, turn to adjust — the ring tells you what's happening before you even look at the screen.</p>
+    <div class="grid-3">
+      <div class="card">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></svg></div>
+        <h3>360×360 round display</h3>
+        <p>Climate down, climate up, thermostat and lights — each page with its own color identity, readable at a glance on the round IPS screen.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><path d="M12 3v18M5 12h14" stroke-linecap="round"/></svg></div>
+        <h3>Climate &amp; lights</h3>
+        <p>Temperature in 0.5 °C steps, HVAC mode cycling, individual light toggles plus all-on / all-off. Touch drag also works on the arc.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg></div>
+        <h3>RGB ring feedback</h3>
+        <p>The ring glows with the active page color, flashes green when a command is sent, shows OK! when Home Assistant confirms, red when it fails.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><path d="M4 12h16M4 12l4-4M4 12l4 4M20 12l-4-4m4 4l-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Screensaver &amp; wake</h3>
+        <p>After 45 s of inactivity the branded screensaver takes over. Any twist or touch wakes it instantly — the ring lights up with the page you're on.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke-linejoin="round"/></svg></div>
+        <h3>Fail-safe by design</h3>
+        <p>Every command goes through Home Assistant and is confirmed by the real device state. No direct actuation, no cloud dependency, no lock control.</p>
+      </div>
+      <div class="card">
+        <div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" stroke-linejoin="round"/><path d="M12 6v6l4 2" stroke-linecap="round"/></svg></div>
+        <h3>Tested on real hardware</h3>
+        <p>Display init sequence, touch, encoder and debounce verified on a real CrowPanel 1.46″ — not a theory, a working firmware.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:var(--panel);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+  <div class="container">
+    <div class="section-label">How it works</div>
+    <h2>Three moves, zero menu diving</h2>
+    <p class="lead">No touchscreen maze. The knob is the interface.</p>
+    <div class="steps">
+      <div class="step">
+        <h3>Turn to navigate</h3>
+        <p>Rotate the knob to move between pages — CLIMATE DOWN, CLIMATE UP, THERMOSTAT, LIGHTS. The ring changes color with every page.</p>
+      </div>
+      <div class="step">
+        <h3>Click to lock</h3>
+        <p>Press the knob to fix the page. The "ADJUST" label appears: now the rotation controls the value, not the page.</p>
+      </div>
+      <div class="step">
+        <h3>Turn to adjust</h3>
+        <p>Rotate to change temperature in 0.5 °C steps. Home Assistant confirms with a green flash and OK! — or red if something fails.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="included">
+  <div class="container">
+    <div class="section-label">What's included</div>
+    <h2>Everything you need to go live in ~10 minutes</h2>
+    <div class="split">
+      <div>
+        <ul class="list-card">
+          <li><span class="tick"></span><span><strong>knob-casa.yaml</strong> — complete ESPHome configuration: display (ili9xxx with the official Elecrow init sequence), touch CST816S, rotary encoder, RGB ring, screensaver, command feedback</span></li>
+          <li><span class="tick"></span><span><strong>Setup guide in English &amp; Italian</strong> — 10-minute installation, entity mapping, color customization, troubleshooting</span></li>
+          <li><span class="tick"></span><span><strong>secrets.yaml.example</strong> — credential template (you generate your own API key)</span></li>
+          <li><span class="tick"></span><span><strong>flash.sh</strong> — one-command compile &amp; flash for Linux</span></li>
+          <li><span class="tick"></span><span><strong>Branded screensaver asset</strong> — the KNOB360 artwork, ready to compile in</span></li>
+          <li><span class="tick"></span><span><strong>Support</strong> — help via eBay messages after purchase</span></li>
+        </ul>
+      </div>
+      <div class="req">
+        <h3>Requirements</h3>
+        <ul>
+          <li><span class="dot">●</span> Elecrow CrowPanel 1.46″ (DHR55146D) — hardware <em>not</em> included</li>
+          <li><span class="dot">●</span> Home Assistant with the ESPHome add-on (free)</li>
+          <li><span class="dot">●</span> 2.4 GHz Wi-Fi network</li>
+          <li><span class="dot">●</span> USB-C cable for the initial flash</li>
+        </ul>
+      </div>
+    </div>
+    <div class="privacy">
+      <div class="section-label">Privacy</div>
+      <h2>100% local. Zero cloud. Zero accounts.</h2>
+      <p class="lead">KNOB360 talks directly to your Home Assistant over your local network. No vendor cloud, no app, no account, no telemetry — nothing leaves your house. That's not a compromise, it's the product.</p>
+      <div class="pills"><span>No cloud</span><span>No account</span><span>No telemetry</span><span>Local API only</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="photos" style="background:var(--panel);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+  <div class="container">
+    <div class="section-label">Real hardware</div>
+    <h2>Not a render. A real knob.</h2>
+    <p class="lead">Every page photographed on the actual CrowPanel 1.46″ during development — this is the firmware you get, running on the display you'll use.</p>
+    <div class="grid-3">
+      <div class="photo-card">
+        <figure>
+          <img src="photos/gallery/boot.jpg" alt="KNOB360 boot screen: the logo on the round display" loading="lazy">
+          <figcaption>Boot screen — the KNOB360 logo, live</figcaption>
+        </figure>
+      </div>
+      <div class="photo-card">
+        <figure>
+          <img src="photos/gallery/climate-down.jpg" alt="CLIMATE DOWN page on the KNOB360 display: room temp 25.5, set point 25.0, ON and COOL" loading="lazy">
+          <figcaption>CLIMATE DOWN — room temp 25.5°, set point 25.0°, <code>ON</code> · <code>COOL</code></figcaption>
+        </figure>
+      </div>
+      <div class="photo-card">
+        <figure>
+          <img src="photos/gallery/climate-up.jpg" alt="CLIMATE UP page on the KNOB360 display: room temp 26.0, unit off" loading="lazy">
+          <figcaption>CLIMATE UP — room temp 26.0°, unit <code>OFF</code></figcaption>
+        </figure>
+      </div>
+      <div class="photo-card">
+        <figure>
+          <img src="photos/gallery/thermostat.jpg" alt="THERMOSTAT page on the KNOB360 display: room temp 25.2, set point 20.5, ON and AUTO" loading="lazy">
+          <figcaption>THERMOSTAT — room temp 25.2°, set point 20.5°, <code>ON</code> · <code>AUTO</code></figcaption>
+        </figure>
+      </div>
+      <div class="photo-card">
+        <figure>
+          <img src="photos/gallery/lights.jpg" alt="LIGHTS page on the KNOB360 display: All ON and All OFF buttons plus individual light toggles" loading="lazy">
+          <figcaption>LIGHTS — <code>All ON</code> / <code>All OFF</code> + individual toggles</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="background:var(--panel);border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle)">
+  <div class="container center">
+    <div class="section-label">FAQ</div>
+    <h2>Questions, answered</h2>
+    <div class="faq">
+      <details open>
+        <summary>Do I need to write code?</summary>
+        <p>No. You install the ESPHome add-on, copy the files, adapt the entity names to yours (the guide marks every spot with grep-friendly comments), compile and flash. About 10 minutes the first time. A white-glove service (we compile the firmware for you with your entities) is available on request.</p>
+      </details>
+      <details>
+        <summary>What does it control?</summary>
+        <p>Three climate zones (two air conditioners + one thermostat) and up to nine lights with individual toggles and all-on/all-off. Pages, entities and colors are fully customizable in the config.</p>
+      </details>
+      <details>
+        <summary>Is the door lock included?</summary>
+        <p>No — deliberately. The commercial firmware intentionally excludes lock control. Safety first.</p>
+      </details>
+      <details>
+        <summary>Which hardware is required?</summary>
+        <p>The Elecrow CrowPanel 1.46″ HMI (model DHR55146D, ESP32-S3 with 8 MB PSRAM). The pack is software only — the hardware is not included.</p>
+      </details>
+      <details>
+        <summary>What if something doesn't work?</summary>
+        <p>Message me on eBay. Setup support is included in the price, and the guide covers the common failure modes (display init, service calls, Wi-Fi).</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="buy" class="final">
+  <div class="container">
+    <div class="section-label">Get the pack</div>
+    <h2>Turn your home. Literally.</h2>
+    <p class="lead" style="margin:0 auto">Instant digital download — tested config, full guide, support included.</p>
+    <div class="price">€19.90 <small>· digital download</small></div>
+    <div class="cta-row" style="margin-top:26px">
+      <a class="btn btn-primary" href="#buy">Buy on eBay</a>
+    </div>
+    <p class="note">Delivered by message within 1 hour of payment · PayPal accepted</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>© 2026 KNOB360 — developed and tested on real hardware, Slovenia</p>
+    <p><a href="#features">Features</a> · <a href="#faq">FAQ</a> · <a href="#buy">Get the pack</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
